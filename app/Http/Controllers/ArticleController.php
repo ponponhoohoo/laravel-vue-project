@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Articles;
 use App\Http\Requests\ArticleRequest;
+use App\Http\Requests\ImgRequest;
 
 class ArticleController extends Controller
 {
@@ -30,11 +31,22 @@ class ArticleController extends Controller
         $status = 200;
         $message = null;
 
-        $data = $request->all();
-        $item = new Articles();
-        $result = $item->fill($data)->save();
+        // $file = $request->file('imgpath');
+        // $fileName = $file->getClientOriginalName();
+        
+        if ($file = $request->imgpath) {
+            $fileName = time() . $file->getClientOriginalName();
+            $target_path = public_path('uploads/');
+            $file->move($target_path, $fileName);
+        } else {
+            $fileName = "";
+        }
 
-        return response()->json(['post' => $data, 'status' => $status, 'message' => $message]);
+        $data = $request->all();
+    //    $item = new Articles();
+    //    $result = $item->fill($data)->save();
+
+       // return response()->json(['post' => $data, 'status' => $status, 'message' => $message]);
     }
 
     /**

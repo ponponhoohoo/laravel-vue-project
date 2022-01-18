@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ArticleRequest extends FormRequest
+class ImgRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,9 +26,6 @@ class ArticleRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|max:20',
-            'content' => 'required',
-            'category' => 'required|numeric',
             'imgpath'=>['file','mimes:jpeg,png,jpg,bmb','max:2048'],
         ];
     }
@@ -36,23 +33,14 @@ class ArticleRequest extends FormRequest
     public function messages()
     {
         return [
-            'title.required' => ':attributeは必須項目です。',
-            'title.max' => ':attributeは20文字以内です。',
-            'content.required' => ':attributeは必須項目です。',
-            'category.required' => ':attributeは必須項目です。',
-            'category.numeric' => ':attributeは数値です。',
+
             'imgpath.max' => ':attributeは2048MG以内です',
-            'imgpath.file' => ':attributeをアップロードしてください',
-            'imgpath.mimes' => ':attributeはjpeg,png,jpg,bmbのみ有効です',
         ];
     }
 
     public function attributes()
     {
         return [
-            'title' => 'タイトル',
-            'content' => 'コンテンツ',
-            'category' => 'カテゴリ',
             'imgpath' => '画像',
         ];
     }

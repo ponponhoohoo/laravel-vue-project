@@ -9,7 +9,14 @@
         <p v-if="this.errors.title == true">{{this.messages.title}}</p>
         <input type="text" placeholder="名前を入力してください" v-model="forms.content">
         <p v-if="this.errors.content == true">{{this.messages.content}}</p>
-        <input type="text" placeholder="名前を入力してください" v-model="forms.category">
+
+        <input @change="fileSelect" type="file">
+        <ul v-if="this.errors.imgpath == true">
+          <li v-for="item in this.messages.imgpath">{{item}}</li>
+        </ul>
+        <span v-for="item in this.categories">
+            <input type="radio" v-model="forms.category" v-bind:value="item.id"><label>{{ item.name }}</label>
+        </span>
         <p v-if="this.errors.category == true">{{this.messages.category}}</p>
         <button @click="send()">送信する</button>
 
@@ -33,21 +40,25 @@ export default {
         content:"",
         category:"",
         categories: {},
+        imgpath:"",
         error_flg:false,
         errors: {
           title: false,
           content: false,
           category: false,
+          imgpath: false,
         },
         messages: {
           title: false,
           content: false,
           category: false,
+          imgpath: false,
         },
         forms: {
           title: "",
           content: "",
           category: "",
+          imgpath:"",
         },
       }
     },
@@ -59,13 +70,16 @@ export default {
             this.title = "inoue"
             return this.title
         },
+        fileSelect: function(e) {
+            //選択したファイルの情報を取得しプロパティにいれる
+            this.imgpath = e.target.files[0];
+            console.log(this.imgpath)
+        },
         getCategory() {
             axios
             .get("/api/category/")
             .then(response => {
                 this.categories = response.data;
-                console.log(this.categories);
-                
             })
             .catch(err => {
                 this.message = err;
@@ -78,10 +92,26 @@ export default {
           this.errors[key] = false;
           this.messages[key] = null;
         })
+
+        let formData = new FormData();
+        //appendでデータを追加(第一引数は任意のキー)
+        //他に送信したいデータがある場合にはその分appendする
+        formData.append('title',this.forms.title);
+        formData.append('content',this.forms.title);
+        formData.append('category',this.forms.category);
+        formData.append('imgpath',this.imgpath);
+
+        let config = {
+            headers: {
+                'content-type': 'multipart/form-data'
+            }
+        };
+
         // 送信処理
-        axios.post('/api/article', this.forms)
+        axios.post('/api/article', formData,config)
         .then((res) => {
           let response = res.data;
+          console.log(response)
           //console.log(response);
           if (response.status == 400) {
             // バリデーションエラー

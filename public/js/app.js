@@ -1968,6 +1968,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'ArticleInput',
   data: function data() {
@@ -1976,21 +1983,25 @@ __webpack_require__.r(__webpack_exports__);
       content: "",
       category: "",
       categories: {},
+      imgpath: "",
       error_flg: false,
       errors: {
         title: false,
         content: false,
-        category: false
+        category: false,
+        imgpath: false
       },
       messages: {
         title: false,
         content: false,
-        category: false
+        category: false,
+        imgpath: false
       },
       forms: {
         title: "",
         content: "",
-        category: ""
+        category: "",
+        imgpath: ""
       }
     };
   },
@@ -2002,12 +2013,16 @@ __webpack_require__.r(__webpack_exports__);
       this.title = "inoue";
       return this.title;
     },
+    fileSelect: function fileSelect(e) {
+      //選択したファイルの情報を取得しプロパティにいれる
+      this.imgpath = e.target.files[0];
+      console.log(this.imgpath);
+    },
     getCategory: function getCategory() {
       var _this = this;
 
       axios.get("/api/category/").then(function (response) {
         _this.categories = response.data;
-        console.log(_this.categories);
       })["catch"](function (err) {
         _this.message = err;
       });
@@ -2020,10 +2035,23 @@ __webpack_require__.r(__webpack_exports__);
       Object.keys(this.errors).forEach(function (key) {
         _this2.errors[key] = false;
         _this2.messages[key] = null;
-      }); // 送信処理
+      });
+      var formData = new FormData(); //appendでデータを追加(第一引数は任意のキー)
+      //他に送信したいデータがある場合にはその分appendする
 
-      axios.post('/api/article', this.forms).then(function (res) {
-        var response = res.data; //console.log(response);
+      formData.append('title', this.forms.title);
+      formData.append('content', this.forms.title);
+      formData.append('category', this.forms.category);
+      formData.append('imgpath', this.imgpath);
+      var config = {
+        headers: {
+          'content-type': 'multipart/form-data'
+        }
+      }; // 送信処理
+
+      axios.post('/api/article', formData, config).then(function (res) {
+        var response = res.data;
+        console.log(response); //console.log(response);
 
         if (response.status == 400) {
           // バリデーションエラー
@@ -37810,100 +37838,125 @@ var render = function () {
     _vm._v(" "),
     _c("p", [_vm._v("ArticleInputです。")]),
     _vm._v(" "),
-    _c("div", { staticClass: "form-name" }, [
-      _c("p", [_vm._v("名前")]),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.forms.title,
-            expression: "forms.title",
-          },
-        ],
-        attrs: { type: "text", placeholder: "名前を入力してください" },
-        domProps: { value: _vm.forms.title },
-        on: {
-          input: function ($event) {
-            if ($event.target.composing) {
-              return
-            }
-            _vm.$set(_vm.forms, "title", $event.target.value)
-          },
-        },
-      }),
-      _vm._v(" "),
-      this.errors.title == true
-        ? _c("p", [_vm._v(_vm._s(this.messages.title))])
-        : _vm._e(),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.forms.content,
-            expression: "forms.content",
-          },
-        ],
-        attrs: { type: "text", placeholder: "名前を入力してください" },
-        domProps: { value: _vm.forms.content },
-        on: {
-          input: function ($event) {
-            if ($event.target.composing) {
-              return
-            }
-            _vm.$set(_vm.forms, "content", $event.target.value)
-          },
-        },
-      }),
-      _vm._v(" "),
-      this.errors.content == true
-        ? _c("p", [_vm._v(_vm._s(this.messages.content))])
-        : _vm._e(),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.forms.category,
-            expression: "forms.category",
-          },
-        ],
-        attrs: { type: "text", placeholder: "名前を入力してください" },
-        domProps: { value: _vm.forms.category },
-        on: {
-          input: function ($event) {
-            if ($event.target.composing) {
-              return
-            }
-            _vm.$set(_vm.forms, "category", $event.target.value)
-          },
-        },
-      }),
-      _vm._v(" "),
-      this.errors.category == true
-        ? _c("p", [_vm._v(_vm._s(this.messages.category))])
-        : _vm._e(),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
+    _c(
+      "div",
+      { staticClass: "form-name" },
+      [
+        _c("p", [_vm._v("名前")]),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.forms.title,
+              expression: "forms.title",
+            },
+          ],
+          attrs: { type: "text", placeholder: "名前を入力してください" },
+          domProps: { value: _vm.forms.title },
           on: {
-            click: function ($event) {
-              return _vm.send()
+            input: function ($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.$set(_vm.forms, "title", $event.target.value)
             },
           },
-        },
-        [_vm._v("送信する")]
-      ),
-      _vm._v(" "),
-      this.error_flg == true
-        ? _c("p", [_vm._v("入力に誤りがありました。")])
-        : _vm._e(),
-    ]),
+        }),
+        _vm._v(" "),
+        this.errors.title == true
+          ? _c("p", [_vm._v(_vm._s(this.messages.title))])
+          : _vm._e(),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.forms.content,
+              expression: "forms.content",
+            },
+          ],
+          attrs: { type: "text", placeholder: "名前を入力してください" },
+          domProps: { value: _vm.forms.content },
+          on: {
+            input: function ($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.$set(_vm.forms, "content", $event.target.value)
+            },
+          },
+        }),
+        _vm._v(" "),
+        this.errors.content == true
+          ? _c("p", [_vm._v(_vm._s(this.messages.content))])
+          : _vm._e(),
+        _vm._v(" "),
+        _c("input", {
+          attrs: { type: "file" },
+          on: { change: _vm.fileSelect },
+        }),
+        _vm._v(" "),
+        this.errors.imgpath == true
+          ? _c(
+              "ul",
+              _vm._l(this.messages.imgpath, function (item) {
+                return _c("li", [_vm._v(_vm._s(item))])
+              }),
+              0
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _vm._l(this.categories, function (item) {
+          return _c("span", [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.forms.category,
+                  expression: "forms.category",
+                },
+              ],
+              attrs: { type: "radio" },
+              domProps: {
+                value: item.id,
+                checked: _vm._q(_vm.forms.category, item.id),
+              },
+              on: {
+                change: function ($event) {
+                  return _vm.$set(_vm.forms, "category", item.id)
+                },
+              },
+            }),
+            _c("label", [_vm._v(_vm._s(item.name))]),
+          ])
+        }),
+        _vm._v(" "),
+        this.errors.category == true
+          ? _c("p", [_vm._v(_vm._s(this.messages.category))])
+          : _vm._e(),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            on: {
+              click: function ($event) {
+                return _vm.send()
+              },
+            },
+          },
+          [_vm._v("送信する")]
+        ),
+        _vm._v(" "),
+        this.error_flg == true
+          ? _c("p", [_vm._v("入力に誤りがありました。")])
+          : _vm._e(),
+      ],
+      2
+    ),
   ])
 }
 var staticRenderFns = []
